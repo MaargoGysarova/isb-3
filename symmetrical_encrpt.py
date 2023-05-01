@@ -14,7 +14,7 @@ settings = {
 
 
 class SymmetricalEncryption:
-    def __init__(self, size: int, decrypt_file: str, encrypt_file: str,
+    def __init__(self, size: int = 256, decrypt_file: str = settings["decrypted_file"], encrypt_file: str = settings["encrypted_file"],
                  symmetric_key_file: str = settings["symmetric_key"]) -> None:
         self.size = size
         self.sym_key_file = symmetric_key_file
@@ -25,11 +25,14 @@ class SymmetricalEncryption:
     def generation_symmetric_key(self):
         return os.urandom(self.size)
 
+    def get_symmetric_key(self):
+        return self.generation_symmetric_key()
+
     # сериализация симметричного ключа
-    def serialization_symmetric_key(self, key):
+    def serialization_symmetric_key(self):
         try:
             with open(self.sym_key_file, 'wb') as key_out:
-                key_out.write(key)
+                key_out.write(self.generation_symmetric_key())
         except:
             logging.error(f"error in file")
 

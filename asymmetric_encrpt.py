@@ -28,6 +28,8 @@ class AsymmetricEncryption:
         self.private_pem = private_key_file
         self.encryption_file = chiphed_file
         self.decrypted_file = decrypted_file
+        self.public_key = self.generation_asymmetric_key()[1]
+        self.private_key = self.generation_asymmetric_key()[0]
 
     # генерация пары ключей для асимметричного алгоритма шифрования
     def generation_asymmetric_key(self):
@@ -38,12 +40,9 @@ class AsymmetricEncryption:
         public_key = private_key.public_key()
         return private_key, public_key
 
-    def generation_symmetric_key(self):
-        return os.urandom(32)
-
     # сериализация приватного ключа в формате PEM
-    def serialization_asymmetric_private_key(self, keys):
-        private_key = keys[0]
+    def serialization_asymmetric_private_key(self):
+        private_key = self.private_key
         try:
             with open(self.private_pem, 'wb') as private_out:
                 private_out.write(private_key.private_bytes(encoding=serialization.Encoding.PEM,
@@ -53,8 +52,8 @@ class AsymmetricEncryption:
             logging.error(f"error in file")
 
     # сериализация публичного ключа в формате PEM
-    def serialization_asymmetric_public_key(self, keys):
-        public_key = keys[1]
+    def serialization_asymmetric_public_key(self):
+        public_key = self.public_key
         try:
             with open(self.public_pem, 'wb') as public_out:
                 public_out.write(public_key.public_bytes(encoding=serialization.Encoding.PEM,
@@ -76,21 +75,9 @@ class AsymmetricEncryption:
         d_private_key = load_pem_private_key(private_bytes, password=None, )
         return d_private_key
 
-    # Зашифровать ключ симметричного шифрования открытым ключом и сохранить по указанному пути.
-    def encryption_symmetric_key(self, public_key, symmetric_key):
-        try:
-            with open(self.settings['symmetric_key'], 'wb') as file:
-                file.write(public_key.encrypt(
-                    symmetric_key,
-                    padding.OAEP(
-                        mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                        algorithm=hashes.SHA256(),
-                        label=None)))
-        except:
-            logging.error(f"error in file")
-
     # шифрование текста при помощи RSA-OAEP
-    def encryption_text(self, public_key, text):
+    def encryption_text(self, text):
+        public_key = self.public_key
         try:
             ciphertext = public_key.encrypt(
                 text.encode(),
@@ -103,7 +90,8 @@ class AsymmetricEncryption:
             logging.error(f"error in file")
 
     # расшифровка текста при помощи RSA-OAEP
-    def decryption_text(self, private_key, ciphertext):
+    def decryption_text(self, ciphertext):
+        private_key = self.private_key
         try:
             plaintext = private_key.decrypt(
                 ciphertext,
@@ -146,5 +134,20 @@ class AsymmetricEncryption:
             with open(self.decrypted_file, 'rb') as file:
                 plaintext = file.read()
             return plaintext
+        except:
+            logging.error(f"error in file")
+
+#Зашифровать ключ симметричного шифрования открытым ключом и сохранить по указанному пути.
+    def encryption_symmetric_key(self, key):
+        public_key = self.public_key
+        try:
+            ciphertext = public_key.encrypt(
+                key,
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None))
+            with open(settings['encr_symmetric_key'], 'wb') as file:
+                file.write(ciphertext)
         except:
             logging.error(f"error in file")

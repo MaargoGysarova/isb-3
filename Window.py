@@ -1,15 +1,11 @@
 from PyQt6.QtGui import QFont, QPixmap
-from PyQt6.QtWidgets import QApplication, QMainWindow, QToolTip, QWidget, QLabel
-from PyQt6.QtWidgets import QPushButton
-from PyQt6.QtCore import QEvent
-from PyQt6.QtCore import QCoreApplication, QSize, Qt
+from PyQt6.QtWidgets import QApplication, QMainWindow, QToolTip, QLabel
 import sys
 from PyQt6 import QtWidgets
+import symmetrical_encrpt
+import asymmetric_encrpt
 
-
-
-
-
+# приложение с тремя кнопками и одним лейблом
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -21,17 +17,11 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Application programing laba 3')
         self.setFixedSize(self.size())
         QToolTip.setFont(QFont('SansSerif', 10))
-        self.setStyleSheet("background-image: url(./671076_main.jpg);")
+        self.setStyleSheet("background-image: url(.hacker2.jpg);")
 
-        # Запрос пути
-        self.folder_path_dataset = ""
-        while self.folder_path_dataset == "":
-            self.folder_path_dataset = QtWidgets.QFileDialog.getExistingDirectory(
-                self, "Please select folder of dataset"
-            )
 
         self.button1 = QtWidgets.QPushButton(self)
-        self.button1.setText("Стандартный csv")
+        self.button1.setText("Работа с ключами")
         self.button1.setGeometry(150, 30, 300, 50)
         self.button1.setFixedWidth(300)
         self.button1.setFont(btn_font_main)
@@ -84,35 +74,31 @@ class MainWindow(QMainWindow):
         self.btn_next_leo.setStyleSheet(btn_StyleSheet_main)
         self.btn_next_leo.clicked.connect(self.next_leo)
 
-        self.image_leo = QLabel(self)
-        self.image_tiger = QLabel(self)
-        self.tiger_iterator = Iterator.SimpleIterator('tiger', 'dataset_csv_first')
-        self.leo_iterator = Iterator.SimpleIterator('leopard', 'dataset_csv_first')
+
 
 
     def click_button_1(self):
-        csv_file_first.main()
+        sym_encrpt = symmetrical_encrpt.SymmetricalEncryption()
+        asym_encrpt = asymmetric_encrpt.AsymmetricEncryption()
+        asym_encrpt.serialization_asymmetric_private_key()
+        asym_encrpt.serialization_asymmetric_public_key()
+        sym_encrpt.serialization_symmetric_key()
+        asym_encrpt.encryption_symmetric_key(sym_encrpt.get_symmetric_key())
+
+
+
 
     def click_button_2(self):
-        csv_file_third.main()
+        print('button 2')
 
     def click_button_3(self):
-        csv_file_second.main()
+        print('button 3')
 
     def buttonClicked(self):
         msg = 'Button was pressed'
         self.statusBar().showMessage(msg, 2000)
         self.statusBar().setStyleSheet("background-color: #171982; color: #000000;")
 
-    def next_leo(self):
-        self.image_leo.setPixmap(QPixmap(next(self.leo_iterator)))
-        self.image_leo.setGeometry(620, 100, 400, 400)
-        self.image_leo.show()
-
-    def next_tiger(self):
-        self.image_tiger.setPixmap(QPixmap(next(self.tiger_iterator)))
-        self.image_tiger.setGeometry(160, 100, 400, 400)
-        self.image_tiger.show()
 
 
 
