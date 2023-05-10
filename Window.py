@@ -1,108 +1,179 @@
+import os
+import shutil
+
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QPixmap
-from PyQt6.QtWidgets import QApplication, QMainWindow, QToolTip, QLabel
+from PyQt6.QtWidgets import QApplication, QMainWindow, QToolTip, QLabel, QFileDialog, QLineEdit, QWidget, QVBoxLayout, \
+    QPushButton
 import sys
 from PyQt6 import QtWidgets
 import symmetrical_encrpt
 import asymmetric_encrpt
+import logging
 
-# приложение с тремя кнопками и одним лейблом
+
 class MainWindow(QMainWindow):
+
     def __init__(self):
+        self.way = ''
+        self.count = 0
         super(MainWindow, self).__init__()
-        btn_font_main = QFont('Impact', 20)
-        btn_StyleSheet_main = 'background-color: #171982; color: 000000; border :1px solid;'
+        self.flag_click_button_1 = None
+        btn_font_main = QFont('Impact', 25)
+        btn_StyleSheet_main = 'background-color: #ffffff; color: #4682B4; border :1px solid;'
 
         # параметры окна
         self.setGeometry(50, 50, 1200, 675)
         self.setWindowTitle('Application programing laba 3')
         self.setFixedSize(self.size())
         QToolTip.setFont(QFont('SansSerif', 10))
-        self.setStyleSheet("background-image: url(.hacker2.jpg);")
 
+        self.label = QLabel(self)
+        self.label.setPixmap(QPixmap('1670825741_3-27.jpg'))
+        self.label.setGeometry(0, 0, 1200, 675)
+        self.label.setScaledContents(True)
 
         self.button1 = QtWidgets.QPushButton(self)
-        self.button1.setText("Работа с ключами")
-        self.button1.setGeometry(150, 30, 300, 50)
-        self.button1.setFixedWidth(300)
+        self.button1.setText("Сгенерировать ключи")
+        self.button1.setGeometry(450, 150, 300, 50)
+        self.button1.setFixedWidth(400)
         self.button1.setFont(btn_font_main)
         self.button1.setStyleSheet(btn_StyleSheet_main)
         self.button1.clicked.connect(self.click_button_1)
-        self.button1.clicked.connect(self.buttonClicked)
         self.button1.enterEvent = lambda event: self.button1.setStyleSheet(
-            'background-color: #171982; color: #D2691E; border :1px solid; border-color: #D2691E;')
+            'background-color: #ffffff; color: #D2691E; border :1px solid; border-color: #D2691E;')
         self.button1.leaveEvent = lambda event: self.button1.setStyleSheet(
-            'background-color: #171982; color: 000000; border :1px solid;')
+            'background-color: #ffffff; color: #4682B4; border :1px solid;')
+        self.buttonSuccess_save()
 
         self.button2 = QtWidgets.QPushButton(self)
-        self.button2.setText("Сsv c рандомными числами")
-        self.button2.setGeometry(450, 30, 300, 50)
-        self.button2.setFixedWidth(300)
+        self.button2.setText("Зашифровать текст")
+        self.button2.setGeometry(450, 230, 300, 50)
+        self.button2.setFixedWidth(400)
         self.button2.setFont(btn_font_main)
         self.button2.setStyleSheet(btn_StyleSheet_main)
+
         self.button2.clicked.connect(self.click_button_2)
-        self.button2.clicked.connect(self.buttonClicked)
 
         self.button2.enterEvent = lambda event: self.button2.setStyleSheet(
-            'background-color: #171982; color: #D2691E; border :1px solid; border-color: #D2691E;')
+            'background-color: #ffffff; color: #D2691E; border :1px solid; border-color: #D2691E;')
         self.button2.leaveEvent = lambda event: self.button2.setStyleSheet(
-            'background-color: #171982; color: 000000; border :1px solid;')
+            'background-color: #ffffff; color: #4682B4; border :1px solid;')
 
         self.button3 = QtWidgets.QPushButton(self)
-        self.button3.setText("Csv  'метка_номер'")
-        self.button3.setGeometry(750, 30, 300, 50)
-        self.button3.setFixedWidth(300)
+        self.button3.setText("Расшифровать текст")
+        self.button3.setGeometry(450, 310, 300, 50)
+        self.button3.setFixedWidth(400)
         self.button3.setFont(btn_font_main)
         self.button3.setStyleSheet(btn_StyleSheet_main)
+        print(self.count)
         self.button3.clicked.connect(self.click_button_3)
-        self.button3.clicked.connect(self.buttonClicked)
+
         self.button3.enterEvent = lambda event: self.button3.setStyleSheet(
-            'background-color: #171982; color: #D2691E; border :1px solid; border-color: #D2691E;')
+            'background-color: #ffffff; color: #D2691E; border :1px solid; border-color: #D2691E;')
         self.button3.leaveEvent = lambda event: self.button3.setStyleSheet(
-            'background-color: #171982; color: 000000; border :1px solid;')
-
-        self.btn_next_tiger = QtWidgets.QPushButton(self)
-        self.btn_next_tiger.setText("Следующий тигр")
-        self.btn_next_tiger.setGeometry(300, 580, 200, 40)
-        self.btn_next_tiger.setFont(btn_font_main)
-        self.btn_next_tiger.setStyleSheet(btn_StyleSheet_main)
-        self.btn_next_tiger.clicked.connect(self.next_tiger)
-
-        self.btn_next_leo = QtWidgets.QPushButton(self)
-        self.btn_next_leo.setText("Следующий леопард")
-        self.btn_next_leo.setGeometry(700, 580, 200, 40)
-        self.btn_next_leo.setFont(btn_font_main)
-        self.btn_next_leo.setStyleSheet(btn_StyleSheet_main)
-        self.btn_next_leo.clicked.connect(self.next_leo)
-
-
-
+            'background-color: #ffffff; color: #4682B4; border :1px solid;')
 
     def click_button_1(self):
-        sym_encrpt = symmetrical_encrpt.SymmetricalEncryption()
-        asym_encrpt = asymmetric_encrpt.AsymmetricEncryption()
+
+        # строка для ввода текста и кнопка для его сохранения в переменную
+        self.input_text = QLineEdit(self)
+        self.input_text.setGeometry(450, 150, 300, 50)
+        self.input_text.setFixedWidth(400)
+        self.input_text.setFont(QFont('Impact', 25))
+        self.input_text.setStyleSheet('background-color: #ffffff; color: #4682B4; border :1px solid;')
+        self.input_text.setPlaceholderText("Введите текст")
+        self.input_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.input_text.textChanged.connect(self.input_text_changed)
+
+        # кнопка для сохранения введенного текста в переменную
+        self.button_save_input_text = QtWidgets.QPushButton(self)
+        self.button_save_input_text.setText("Сохранить")
+        self.button_save_input_text.setGeometry(450, 230, 300, 50)
+        self.button_save_input_text.setFixedWidth(400)
+        self.button_save_input_text.setFont(QFont('Impact', 25))
+        self.button_save_input_text.setStyleSheet('background-color: #ffffff; color: #4682B4; border :1px solid;')
+        self.button_save_input_text.clicked.connect(self.buttonClicked_save_input_text)
+        self.button_save_input_text.enterEvent = lambda event: self.button_save_input_text.setStyleSheet(
+            'background-color: #ffffff; color: #D2691E; border :1px solid; border-color: #D2691E;')
+        self.button_save_input_text.leaveEvent = lambda event: self.button_save_input_text.setStyleSheet(
+            'background-color: #ffffff; color: #4682B4; border :1px solid;')
+
+        # показать строку для ввода текста и кнопку для сохранения введенного текста
+        self.input_text.show()
+        self.button_save_input_text.show()
+
+        # после нажатия кнопки Сохранить, скрыть строку для ввода текста и кнопку для сохранения введенного текста
+        self.button_save_input_text.clicked.connect(self.input_text.hide)
+        self.button_save_input_text.clicked.connect(self.button_save_input_text.hide)
+        self.button_save_input_text.clicked.connect(self.save_crypto)
+
+        print('button 1')
+        self.count += 1
+        print(self.count)
+
+    def save_crypto(self):
+        # read way from input_text
+        way = self.input_text.text()
+        # создать папку в проекте для хранения ключей с названием way
+        if os.path.exists(way):
+            shutil.rmtree(way)
+        if not os.path.exists(way):
+            os.mkdir(way)
+
+        # классы для генерации ключей и их сериализации
+        sym_encrpt = symmetrical_encrpt.SymmetricalEncryption(256, way)
+        asym_encrpt = asymmetric_encrpt.AsymmetricEncryption(256, way)
+        # сохранение ключей в файлы
+        sym_encrpt.serialization_symmetric_key()
+
         asym_encrpt.serialization_asymmetric_private_key()
         asym_encrpt.serialization_asymmetric_public_key()
-        sym_encrpt.serialization_symmetric_key()
+
         asym_encrpt.encryption_symmetric_key(sym_encrpt.get_symmetric_key())
 
 
+    def buttonClicked_save_input_text(self):
+        self.text = self.input_text.text()
+        # print(self.text)
+        self.input_text.close()
 
+    def input_text_changed(self, text):
+        print(text)
 
     def click_button_2(self):
         print('button 2')
+        if self.count == 0:
+            self.buttonClicked_fail()
+        else:
+            self.buttonSuccess_shifr()
 
     def click_button_3(self):
         print('button 3')
+        if self.count == 0:
+            self.buttonClicked_fail()
+        else:
+            self.buttonSuccess_deshifr()
 
-    def buttonClicked(self):
-        msg = 'Button was pressed'
-        self.statusBar().showMessage(msg, 2000)
-        self.statusBar().setStyleSheet("background-color: #171982; color: #000000;")
+    def buttonClicked_fail(self):
+        self.statusBar().showMessage("Сначала сгенерируйте ключи", 2000)
+        self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
+    def buttonSuccess_gen(self):
+        self.statusBar().showMessage("Ключи сгенерированы", 2000)
+        self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
+    def buttonSuccess_shifr(self):
+        self.statusBar().showMessage("Текст зашифрован", 2000)
+        self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
+    def buttonSuccess_deshifr(self):
+        self.statusBar().showMessage("Текст дешифрован", 2000)
+        self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
-
+    def buttonSuccess_save(self):
+        self.statusBar().showMessage("Сохранено", 2000)
+        self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
 
 app = QApplication(sys.argv)

@@ -3,43 +3,42 @@ from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import logging
 
-settings = {
-    'initial_file': 'path/to/inital/file.txt',
-    'encrypted_file': 'path/to/encrypted/file.txt',
-    'decrypted_file': 'path/to/decrypted/file.txt',
-    'symmetric_key': 'path/to/symmetric/key.txt',
-    'public_key': 'path/to/public/key.pem',
-    'secret_key': 'path/to/secret/key.pem',
-}
+
 
 
 class SymmetricalEncryption:
-    def __init__(self, size: int = 256, decrypt_file: str = settings["decrypted_file"], encrypt_file: str = settings["encrypted_file"],
-                 symmetric_key_file: str = settings["symmetric_key"]) -> None:
-        self.size = size
-        self.sym_key_file = symmetric_key_file
-        self.decrypt_file = decrypt_file
-        self.encrypt_file = encrypt_file
+    def __init__(self, size: int, way: str) -> None:
+        self.size = int(size/8)
+        self.way = way
+        self.settings = {
+            'initial_file': os.path.join(self.way, 'initial_file.txt'),
+            'encrypted_file': os.path.join(self.way, 'encrypted_file.txt'),
+            'decrypted_file': os.path.join(self.way, 'decrypted_file.txt'),
+            'symmetric_key': os.path.join(self.way, 'symmetric_key.txt'),
+            'public_key': os.path.join(self.way, 'public_key.txt'),
+            'private_key': os.path.join(self.way, 'private_key.txt')
+        }
+        self.symm_key = self.generation_symmetric_key()
 
     # генерация симметричного ключа
     def generation_symmetric_key(self):
         return os.urandom(self.size)
 
     def get_symmetric_key(self):
-        return self.generation_symmetric_key()
+        return self.symm_key
 
     # сериализация симметричного ключа
     def serialization_symmetric_key(self):
         try:
-            with open(self.sym_key_file, 'wb') as key_out:
-                key_out.write(self.generation_symmetric_key())
+            with open(self.settings['symmetric_key'], 'wb') as key_out:
+                key_out.write(self.symm_key)
         except:
             logging.error(f"error in file")
 
     # десериализация симметричного ключа
     def deserialization_symmetric_key(self):
         try:
-            with open(self.sym_key_file, 'rb') as key_in:
+            with open(self.settings['symmetric_key'], 'rb') as key_in:
                 key = key_in.read()
         except:
             logging.error(f"error in file")
