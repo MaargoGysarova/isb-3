@@ -3,7 +3,6 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
-from PyQt6 import QtWidgets
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.primitives.serialization import load_pem_public_key, load_pem_private_key
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -74,7 +73,7 @@ class AsymmetricEncryption:
         return d_private_key
 
     # шифрование текста при помощи RSA-OAEP
-    def encryption_text(self, way_file):
+    def encryption_text(self, way_file: str) -> None:
         # расшифровка симметричного ключа
         symmetric_key = self.decryption_symmetric_key()
         # чтение файла
@@ -109,7 +108,7 @@ class AsymmetricEncryption:
             logging.info("Тескт зашифрован")
 
     # расшифровка текста при помощи RSA-OAEP
-    def decryption_text(self, way_file)->str:
+    def decryption_text(self, way_file) -> None:
         """
             Функция расшифровки текста алгоритма 3DES
 
@@ -143,10 +142,14 @@ class AsymmetricEncryption:
                 f"{err} ошибка при записи в файл {self.settings['decrypted_file']}")
         else:
             logging.info("Текст расшифрован")
-        return self.settings['decrypted_file']
 
     # Зашифровать ключ симметричного шифрования открытым ключом и сохранить по указанному пути.
-    def encryption_symmetric_key(self, key):
+    def encryption_symmetric_key(self, key: bytes) -> None:
+        """
+            Функция шифрования ключа симметричного шифрования
+
+            Возвращает путь до зашифрованного ключа
+        """
         try:
             ciphertext = self.public_key.encrypt(key, padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
                                                                    algorithm=hashes.SHA256(), label=None))

@@ -1,10 +1,8 @@
 import os
 import shutil
-
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QPixmap
-from PyQt6.QtWidgets import QApplication, QMainWindow, QToolTip, QLabel, QFileDialog, QLineEdit, QWidget, QVBoxLayout, \
-    QPushButton
+from PyQt6.QtWidgets import QApplication, QMainWindow, QToolTip, QLabel, QFileDialog, QLineEdit
 import sys
 from PyQt6 import QtWidgets
 import symmetrical_encrpt
@@ -115,7 +113,7 @@ class MainWindow(QMainWindow):
         print(self.count)
 
     def save_crypto(self):
-        # read way from input_text
+        # сохранение введенного текста в переменную
         way = self.input_text.text()
         # создать папку в проекте для хранения ключей с названием way
         if os.path.exists(way):
@@ -150,37 +148,39 @@ class MainWindow(QMainWindow):
             way_file = str(QFileDialog.getOpenFileName(caption='Выберите файл для шифрования', filter='*.txt'))
             way_file = way_file.split('\'')[1]
             self.asym_encrpt.encryption_text(way_file)
-            way_dcr = os.path.join(self.way, 'decrypted_file.txt')
-            self.buttonSuccess_shifr(way_dcr)
+            way_encr = os.path.join(self.way, 'encrypted_file.txt')
+            self.buttonSuccess_shifr(way_encr)
 
     def click_button_3(self):
         print('button 3')
         if self.count == 0:
             self.buttonClicked_fail()
         else:
-            way_file = str(QFileDialog.getOpenFileName(caption='Выберите файл для шифрования', filter='*.txt'))
+            way_file = str(QFileDialog.getOpenFileName(caption='Выберите файл для расшифрования', filter='*.txt'))
             way_file = way_file.split('\'')[1]
-
-            self.buttonSuccess_deshifr()
+            self.asym_encrpt.decryption_text(way_file)
+            way_decr = os.path.join(self.way, 'decrypted_file.txt')
+            self.buttonSuccess_shifr(way_decr)
+            self.buttonSuccess_deshifr(way_decr)
 
     def buttonClicked_fail(self):
-        self.statusBar().showMessage("Сначала сгенерируйте ключи", 2000)
+        self.statusBar().showMessage("Сначала сгенерируйте ключи", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
     def buttonSuccess_gen(self):
-        self.statusBar().showMessage("Ключи сгенерированы", 2000)
+        self.statusBar().showMessage("Ключи сгенерированы", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
     def buttonSuccess_shifr(self, way_file):
         self.statusBar().showMessage(f"Текст зашифрован в файл {way_file}", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
-    def buttonSuccess_deshifr(self):
-        self.statusBar().showMessage("Текст дешифрован", 2000)
+    def buttonSuccess_deshifr(self, way_file):
+        self.statusBar().showMessage(f"Текст дешифрован в файл {way_file}", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
     def buttonSuccess_save(self):
-        self.statusBar().showMessage("Сохранено", 2000)
+        self.statusBar().showMessage("Сохранено", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
 

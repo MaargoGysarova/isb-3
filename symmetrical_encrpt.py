@@ -4,11 +4,9 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import logging
 
 
-
-
 class SymmetricalEncryption:
     def __init__(self, size: int, way: str) -> None:
-        self.size = int(size/8)
+        self.size = int(size / 8)
         self.way = way
         self.settings = {
             'initial_file': os.path.join(self.way, 'initial_file.txt'),
@@ -43,26 +41,6 @@ class SymmetricalEncryption:
         except:
             logging.error(f"error in file")
         return key
-
-    def padding(self, data):
-        padder = sym_padding.PKCS7(128).padder()
-        padded_data = padder.update(data) + padder.finalize()
-        return padded_data
-
-    def serialize_padding(self, data):
-        try:
-            with open("padding.txt", 'wb') as file_out:
-                file_out.write(data)
-        except:
-            logging.error(f"error in file")
-
-    def deserialize_padding(self):
-        try:
-            with open("padding.txt", 'rb') as file_in:
-                data = file_in.read()
-        except:
-            logging.error(f"error in file")
-        return data
 
     # шифрование и паддинг текста симметричным алгоритмом
     def encrypt_simm(self, key, data):
