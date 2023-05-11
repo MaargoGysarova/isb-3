@@ -9,20 +9,11 @@ from cryptography.hazmat.primitives.serialization import load_pem_public_key, lo
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import logging
 
-settings = {
-    'initial_file': 'path/to/inital/file.txt',
-    'encrypted_file': 'path/to/encrypted/file.txt',
-    'decrypted_file': 'path/to/decrypted/file.txt',
-    'symmetric_key': 'path/to/symmetric/key.txt',
-    'public_key': 'path/to/public/key.pem',
-    'secret_key': 'path/to/secret/key.pem',
-}
-
 
 class AsymmetricEncryption:
 
     def __init__(self, size: int, way: str) -> None:
-        self.size = int(size/8)
+        self.size = int(size / 8)
         self.way = way
         self.settings = {
             'initial_file': os.path.join(self.way, 'initial_file.txt'),
@@ -31,7 +22,9 @@ class AsymmetricEncryption:
             'symmetric_key': os.path.join(self.way, 'symmetric_key.txt'),
             'public_key': os.path.join(self.way, 'public_key.txt'),
             'private_key': os.path.join(self.way, 'private_key.txt'),
-            'encr_symmetric_key': os.path.join(self.way, 'encr_symmetric_key.txt')
+            'encr_symmetric_key': os.path.join(self.way, 'encr_symmetric_key.txt'),
+            'decr_symmetric_key': os.path.join(self.way, 'decr_symmetric_key.txt'),
+            'iv_path': os.path.join(self.way, 'iv_path.txt'),
         }
         self.private_key, self.public_key = self.generation_asymmetric_key()
 
@@ -81,18 +74,40 @@ class AsymmetricEncryption:
         return d_private_key
 
     # шифрование текста при помощи RSA-OAEP
-    def encryption_text(self, text):
-        public_key = self.public_key
+    def encryption_text(self, way_file):
+        # расшифровка симметричного ключа
+        symmetric_key = self.decryption_symmetric_key()
+        # чтение файла
         try:
-            ciphertext = public_key.encrypt(
-                text.encode(),
-                padding.OAEP(
-                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                    algorithm=hashes.SHA256(),
-                    label=None))
-            return ciphertext
-        except:
-            logging.error(f"error in file")
+            with open(way_file, 'r', encoding='utf-8') as f:
+                text = f.read()
+        except OSError as err:
+            logging.warning(f"{err} ошибка при чтении из файла {way_file}")
+        else:
+            logging.info("Текст прочитан")
+        # шифрование текста
+        padder = sym_padding.ANSIX923(128).padder()
+        padded_text = padder.update(bytes(text, 'utf-8')) + padder.finalize()
+        iv = os.urandom(8)
+        cipher = Cipher(algorithms.TripleDES(symmetric_key), modes.CBC(iv))
+        encryptor = cipher.encryptor()
+        ciphertext = encryptor.update(padded_text) + encryptor.finalize()
+
+        try:
+            with open(self.settings['iv_path'], 'wb') as key_file:
+                key_file.write(iv)
+        except OSError as err:
+            logging.warning(
+                f"{err} ошибка при записи в файл {self.settings['iv_path']}")
+        try:
+            with open(self.settings['encrypted_file'], 'wb') as f_text:
+                f_text.write(ciphertext)
+        except OSError as err:
+            logging.warning(
+                f"{err} ошибка при записи в файл {self.settings['encrypted_file']}")
+        else:
+            logging.info("Тескт зашифрован")
+
 
     # расшифровка текста при помощи RSA-OAEP
     def decryption_text(self, ciphertext):
@@ -147,15 +162,40 @@ class AsymmetricEncryption:
         try:
             ciphertext = self.public_key.encrypt(key, padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
                                                                    algorithm=hashes.SHA256(), label=None))
-            with open("/Users/margogusarova/PycharmProjects/isb-3.1/incr_sim_key", 'wb') as file:
+            with open(self.settings['encr_symmetric_key'], 'wb') as file:
                 file.write(ciphertext)
         except:
             logging.error(f"error in file")
 
+    # Расшифровать ключ симметричного шифрования закрытым ключом и сохранить по указанному пути.
+    def decryption_symmetric_key(self)->bytes:
+        """
+                Функция расшифровки ключа симметричного шифрования
 
-# main
-if __name__ == '__main__':
-    with open("symmetric_key.txt", 'rb') as key_in:
-        key = key_in.read()
-    As_encr = AsymmetricEncryption(256, '/Users/margogusarova/PycharmProjects/isb-3.1')
-    As_encr.encryption_symmetric_key(key)
+                Возвращает расшифрованный симметричный ключ
+        """
+        try:
+            with open(self.settings['private_key'], "rb") as f:
+                private_key = serialization.load_pem_private_key(
+                    f.read(), password=None)
+        except OSError as err:
+            logging.warning(
+                f"{err} ошибка при чтении из файла {self.settings['private_key']}")
+
+        try:
+            with open(self.settings['encr_symmetric_key'], 'rb') as file:
+                encr_symm_key = file.read()
+        except OSError as err:
+            logging.warning(
+                f"{err} ошибка при чтении из файла {self.settings['encr_symmetric_key']}")
+
+        try:
+            symmetric_decr_key = private_key.decrypt(encr_symm_key, padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                                                                          algorithm=hashes.SHA256(), label=None))
+            with open(self.settings['decr_symmetric_key'], 'wb') as file:
+                file.write(symmetric_decr_key)
+        except:
+            logging.error(f"error in file")
+
+        return symmetric_decr_key
+

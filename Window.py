@@ -15,6 +15,8 @@ import logging
 class MainWindow(QMainWindow):
 
     def __init__(self):
+        self.asym_encrpt = None
+        self.sym_encrpt = None
         self.way = ''
         self.count = 0
         super(MainWindow, self).__init__()
@@ -122,15 +124,15 @@ class MainWindow(QMainWindow):
             os.mkdir(way)
 
         # классы для генерации ключей и их сериализации
-        sym_encrpt = symmetrical_encrpt.SymmetricalEncryption(256, way)
-        asym_encrpt = asymmetric_encrpt.AsymmetricEncryption(256, way)
+        self.sym_encrpt = symmetrical_encrpt.SymmetricalEncryption(256, way)
+        self.asym_encrpt = asymmetric_encrpt.AsymmetricEncryption(256, way)
         # сохранение ключей в файлы
-        sym_encrpt.serialization_symmetric_key()
+        self.sym_encrpt.serialization_symmetric_key()
 
-        asym_encrpt.serialization_asymmetric_private_key()
-        asym_encrpt.serialization_asymmetric_public_key()
+        self.asym_encrpt.serialization_asymmetric_private_key()
+        self.asym_encrpt.serialization_asymmetric_public_key()
 
-        asym_encrpt.encryption_symmetric_key(sym_encrpt.get_symmetric_key())
+        self.asym_encrpt.encryption_symmetric_key(self.sym_encrpt.get_symmetric_key())
 
 
     def buttonClicked_save_input_text(self):
@@ -146,7 +148,20 @@ class MainWindow(QMainWindow):
         if self.count == 0:
             self.buttonClicked_fail()
         else:
-            self.buttonSuccess_shifr()
+            way_file = str(QFileDialog.getOpenFileName(caption='Выберите файл для шифрования', filter='*.txt'))
+            way_file = way_file.split('\'')[1]
+            self.asym_encrpt.encryption_text(way_file)
+            way_dcr = os.path.join(self.way, 'decrypted_file.txt')
+            self.buttonSuccess_shifr(way_dcr)
+
+
+
+
+
+
+
+
+
 
     def click_button_3(self):
         print('button 3')
@@ -163,8 +178,8 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Ключи сгенерированы", 2000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
-    def buttonSuccess_shifr(self):
-        self.statusBar().showMessage("Текст зашифрован", 2000)
+    def buttonSuccess_shifr(self,way_file):
+        self.statusBar().showMessage(f"Текст зашифрован в файл {way_file}", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
     def buttonSuccess_deshifr(self):
