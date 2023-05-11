@@ -134,7 +134,6 @@ class MainWindow(QMainWindow):
 
         self.asym_encrpt.encryption_symmetric_key(self.sym_encrpt.get_symmetric_key())
 
-
     def buttonClicked_save_input_text(self):
         self.text = self.input_text.text()
         # print(self.text)
@@ -154,20 +153,14 @@ class MainWindow(QMainWindow):
             way_dcr = os.path.join(self.way, 'decrypted_file.txt')
             self.buttonSuccess_shifr(way_dcr)
 
-
-
-
-
-
-
-
-
-
     def click_button_3(self):
         print('button 3')
         if self.count == 0:
             self.buttonClicked_fail()
         else:
+            way_file = str(QFileDialog.getOpenFileName(caption='Выберите файл для шифрования', filter='*.txt'))
+            way_file = way_file.split('\'')[1]
+
             self.buttonSuccess_deshifr()
 
     def buttonClicked_fail(self):
@@ -178,7 +171,7 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Ключи сгенерированы", 2000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
-    def buttonSuccess_shifr(self,way_file):
+    def buttonSuccess_shifr(self, way_file):
         self.statusBar().showMessage(f"Текст зашифрован в файл {way_file}", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 

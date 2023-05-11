@@ -88,8 +88,8 @@ class AsymmetricEncryption:
         # шифрование текста
         padder = sym_padding.ANSIX923(128).padder()
         padded_text = padder.update(bytes(text, 'utf-8')) + padder.finalize()
-        iv = os.urandom(8)
-        cipher = Cipher(algorithms.TripleDES(symmetric_key), modes.CBC(iv))
+        iv = os.urandom(16)
+        cipher = Cipher(algorithms.AES(symmetric_key), modes.CBC(iv))
         encryptor = cipher.encryptor()
         ciphertext = encryptor.update(padded_text) + encryptor.finalize()
 
@@ -108,54 +108,42 @@ class AsymmetricEncryption:
         else:
             logging.info("Тескт зашифрован")
 
-
     # расшифровка текста при помощи RSA-OAEP
-    def decryption_text(self, ciphertext):
-        private_key = self.private_key
-        try:
-            plaintext = private_key.decrypt(
-                ciphertext,
-                padding.OAEP(
-                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                    algorithm=hashes.SHA256(),
-                    label=None))
-            return plaintext
-        except:
-            logging.error(f"error in file")
+    def decryption_text(self, way_file)->str:
+        """
+            Функция расшифровки текста алгоритма 3DES
 
-    # сериализация шифрованного текста
-    def serialization_encryption_text(self, ciphertext):
+            Возвращает путь до расщифрованного файла
+        """
+        # расшифровка симметричного ключа
+        symmetric_key = self.decryption_symmetric_key()
+        # чтение файла
         try:
-            with open(self.settings['encrypted_file'], 'wb') as file:
-                file.write(ciphertext)
-        except:
-            logging.error(f"error in file")
-
-    # десериализация шифрованного текста
-    def deserialization_encryption_text(self):
+            with open(way_file, 'rb') as f:
+                ciphertext = f.read()
+        except OSError as err:
+            logging.warning(
+                f"{err} ошибка при чтении из файла {way_file}")
         try:
-            with open(self.settings['encrypted_file'], 'rb') as file:
-                ciphertext = file.read()
-            return ciphertext
-        except:
-            logging.error(f"error in file")
-
-    # сериализация расшифрованного текста
-    def serialization_decryption_text(self, plaintext):
+            with open(self.settings['iv_path'], "rb") as f:
+                iv = f.read()
+        except OSError as err:
+            logging.warning(
+                f"{err} ошибка при чтении из файла {self.settings['iv_path']}")
+        cipher = Cipher(algorithms.TripleDES(symmetric_key), modes.CBC(iv))
+        decryptor = cipher.decryptor()
+        dc_text = decryptor.update(ciphertext) + decryptor.finalize()
+        unpadder = sym_padding.ANSIX923(128).unpadder()
+        unpadded_dc_text = unpadder.update(dc_text) + unpadder.finalize()
         try:
-            with open(self.settings['decrypted_file'], 'wb') as file:
-                file.write(plaintext)
-        except:
-            logging.error(f"error in file")
-
-    # десериализация расшифрованного текста
-    def deserialization_decryption_text(self):
-        try:
-            with open(self.settings['decrypted_file'], 'rb') as file:
-                plaintext = file.read()
-            return plaintext
-        except:
-            logging.error(f"error in file")
+            with open(self.settings['decrypted_file'], 'wb') as f:
+                f.write(unpadded_dc_text)
+        except OSError as err:
+            logging.warning(
+                f"{err} ошибка при записи в файл {self.settings['decrypted_file']}")
+        else:
+            logging.info("Текст расшифрован")
+        return self.settings['decrypted_file']
 
     # Зашифровать ключ симметричного шифрования открытым ключом и сохранить по указанному пути.
     def encryption_symmetric_key(self, key):
@@ -168,7 +156,7 @@ class AsymmetricEncryption:
             logging.error(f"error in file")
 
     # Расшифровать ключ симметричного шифрования закрытым ключом и сохранить по указанному пути.
-    def decryption_symmetric_key(self)->bytes:
+    def decryption_symmetric_key(self) -> bytes:
         """
                 Функция расшифровки ключа симметричного шифрования
 
@@ -190,12 +178,12 @@ class AsymmetricEncryption:
                 f"{err} ошибка при чтении из файла {self.settings['encr_symmetric_key']}")
 
         try:
-            symmetric_decr_key = private_key.decrypt(encr_symm_key, padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                                                                          algorithm=hashes.SHA256(), label=None))
+            symmetric_decr_key = private_key.decrypt(encr_symm_key,
+                                                     padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                                                                  algorithm=hashes.SHA256(), label=None))
             with open(self.settings['decr_symmetric_key'], 'wb') as file:
                 file.write(symmetric_decr_key)
         except:
             logging.error(f"error in file")
 
         return symmetric_decr_key
-
