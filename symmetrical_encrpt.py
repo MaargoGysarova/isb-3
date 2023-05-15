@@ -45,7 +45,7 @@ class SymmetricalEncryption:
     # шифрование и паддинг текста симметричным алгоритмом
     def encrypt_simm(self, key, data):
         iv = os.urandom(16)
-        cipher = Cipher(algorithms.ChaCha20(self.deserialization_symmetric_key()), modes.CBC(iv))
+        cipher = Cipher(algorithms.ChaCha20(self.symm_key), modes.CBC(iv))
         encryptor = cipher.encryptor()
         padder = sym_padding.PKCS7(128).padder()
         padded_data = padder.update(data) + padder.finalize()

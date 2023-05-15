@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.primitives.serialization import load_pem_public_key, load_pem_private_key
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import logging
+from cryptography.hazmat.primitives.ciphers.algorithms import ChaCha20
 
 
 class AsymmetricEncryption:
@@ -87,14 +88,15 @@ class AsymmetricEncryption:
         # шифрование текста
         padder = sym_padding.ANSIX923(128).padder()
         padded_text = padder.update(bytes(text, 'utf-8')) + padder.finalize()
-        iv = os.urandom(16)
-        cipher = Cipher(algorithms.AES(symmetric_key), modes.CBC(iv))
+        nonce = os.urandom(16)
+        algorithm = algorithms.ChaCha20(symmetric_key, nonce)
+        cipher = Cipher(algorithm, mode=None)
         encryptor = cipher.encryptor()
         ciphertext = encryptor.update(padded_text) + encryptor.finalize()
 
         try:
             with open(self.settings['iv_path'], 'wb') as key_file:
-                key_file.write(iv)
+                key_file.write(nonce)
         except OSError as err:
             logging.warning(
                 f"{err} ошибка при записи в файл {self.settings['iv_path']}")
@@ -125,11 +127,12 @@ class AsymmetricEncryption:
                 f"{err} ошибка при чтении из файла {way_file}")
         try:
             with open(self.settings['iv_path'], "rb") as f:
-                iv = f.read()
+                nonce = f.read()
         except OSError as err:
             logging.warning(
                 f"{err} ошибка при чтении из файла {self.settings['iv_path']}")
-        cipher = Cipher(algorithms.TripleDES(symmetric_key), modes.CBC(iv))
+        algorithm = algorithms.ChaCha20(symmetric_key, nonce)
+        cipher = Cipher(algorithm, mode=None)
         decryptor = cipher.decryptor()
         dc_text = decryptor.update(ciphertext) + decryptor.finalize()
         unpadder = sym_padding.ANSIX923(128).unpadder()
