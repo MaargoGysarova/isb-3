@@ -7,7 +7,6 @@ import sys
 from PyQt6 import QtWidgets
 import symmetrical_encrpt
 import asymmetric_encrpt
-import logging
 
 
 class MainWindow(QMainWindow):
@@ -75,6 +74,10 @@ class MainWindow(QMainWindow):
             'background-color: #ffffff; color: #4682B4; border :1px solid;')
 
     def click_button_1(self):
+        """
+         Click button 1
+        :return:
+        """
 
         # строка для ввода текста и кнопка для его сохранения в переменную
         self.input_text = QLineEdit(self)
@@ -112,7 +115,11 @@ class MainWindow(QMainWindow):
         self.count += 1
         print(self.count)
 
-    def save_crypto(self):
+    def save_crypto(self) -> None:
+        """
+        Save keys in files
+        :return:
+        """
         # сохранение введенного текста в переменную
         way = self.input_text.text()
         # создать папку в проекте для хранения ключей с названием way
@@ -132,15 +139,28 @@ class MainWindow(QMainWindow):
 
         self.asym_encrpt.encryption_symmetric_key(self.sym_encrpt.get_symmetric_key())
 
-    def buttonClicked_save_input_text(self):
+    def buttonClicked_save_input_text(self) -> None:
+        """
+        Save input text in variable
+        :return:
+        """
         self.text = self.input_text.text()
         # print(self.text)
         self.input_text.close()
 
-    def input_text_changed(self, text):
+    def input_text_changed(self, text: str) -> None:
+        """
+        Show input text
+        :param text:
+        :return:
+        """
         print(text)
 
-    def click_button_2(self):
+    def click_button_2(self) -> None:
+        """
+        Click button 2
+        :return:
+        """
         print('button 2')
         if self.count == 0:
             self.buttonClicked_fail()
@@ -151,7 +171,11 @@ class MainWindow(QMainWindow):
             way_encr = os.path.join(self.way, 'encrypted_file.txt')
             self.buttonSuccess_shifr(way_encr)
 
-    def click_button_3(self):
+    def click_button_3(self) -> None:
+        """
+        Click button 3
+        :return:
+        """
         print('button 3')
         if self.count == 0:
             self.buttonClicked_fail()
@@ -163,23 +187,23 @@ class MainWindow(QMainWindow):
             self.buttonSuccess_shifr(way_decr)
             self.buttonSuccess_deshifr(way_decr)
 
-    def buttonClicked_fail(self):
+    def buttonClicked_fail(self) -> None:
         self.statusBar().showMessage("Сначала сгенерируйте ключи", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
-    def buttonSuccess_gen(self):
+    def buttonSuccess_gen(self) -> None:
         self.statusBar().showMessage("Ключи сгенерированы", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
-    def buttonSuccess_shifr(self, way_file):
+    def buttonSuccess_shifr(self, way_file: str) -> None:
         self.statusBar().showMessage(f"Текст зашифрован в файл {way_file}", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
-    def buttonSuccess_deshifr(self, way_file):
+    def buttonSuccess_deshifr(self, way_file: str) -> None:
         self.statusBar().showMessage(f"Текст дешифрован в файл {way_file}", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
-    def buttonSuccess_save(self):
+    def buttonSuccess_save(self) -> None:
         self.statusBar().showMessage("Сохранено", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 

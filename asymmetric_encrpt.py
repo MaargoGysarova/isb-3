@@ -29,7 +29,11 @@ class AsymmetricEncryption:
         self.private_key, self.public_key = self.generation_asymmetric_key()
 
     # генерация пары ключей для асимметричного алгоритма шифрования
-    def generation_asymmetric_key(self):
+    def generation_asymmetric_key(self) -> tuple:
+        """
+        :param size: размер ключа
+        :return:
+        """
         keys = rsa.generate_private_key(
             public_exponent=65537,
             key_size=2048
@@ -39,7 +43,11 @@ class AsymmetricEncryption:
         return private_key, public_key
 
     # сериализация приватного ключа в формате PEM
-    def serialization_asymmetric_private_key(self):
+    def serialization_asymmetric_private_key(self) -> None:
+        """
+        :param private_key: приватный ключ
+        :return:
+        """
         private_key = self.private_key
         try:
             with open(self.settings['private_key'], 'wb') as private_out:
@@ -50,7 +58,7 @@ class AsymmetricEncryption:
             logging.error(f"error in file")
 
     # сериализация публичного ключа в формате PEM
-    def serialization_asymmetric_public_key(self):
+    def serialization_asymmetric_public_key(self) -> None:
         public_key = self.public_key
         try:
             with open(self.settings['public_key'], 'wb') as public_out:
@@ -60,21 +68,28 @@ class AsymmetricEncryption:
             logging.error(f"error in file")
 
     # десериализация открытого ключа
-    def get_public_key(self):
+    def get_public_key(self) -> bytes:
         with open(self.settings['public_key'], 'rb') as pem_in:
             public_bytes = pem_in.read()
         d_public_key = load_pem_public_key(public_bytes)
         return d_public_key
 
-    # десериализация закрытого ключа
-    def get_private_key(self):
+    def get_private_key(self) -> bytes:
+        """
+        Функция десериализации закрытого ключа
+        :return:
+        """
         with open(self.settings['privet_key'], 'rb') as pem_in:
             private_bytes = pem_in.read()
         d_private_key = load_pem_private_key(private_bytes, password=None, )
         return d_private_key
 
-    # шифрование текста при помощи RSA-OAEP
     def encryption_text(self, way_file: str) -> None:
+        """
+        Функция шифрования текста алгоритмом RSA-OAEP
+        :param way_file:
+        :return:
+        """
         # расшифровка симметричного ключа
         symmetric_key = self.decryption_symmetric_key()
         # чтение файла
@@ -109,7 +124,6 @@ class AsymmetricEncryption:
         else:
             logging.info("Тескт зашифрован")
 
-    # расшифровка текста при помощи RSA-OAEP
     def decryption_text(self, way_file) -> None:
         """
             Функция расшифровки текста алгоритма 3DES

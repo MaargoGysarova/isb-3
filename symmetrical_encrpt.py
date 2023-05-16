@@ -2,6 +2,7 @@ import os
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import logging
+from cryptography.hazmat.primitives.ciphers.algorithms import ChaCha20
 
 
 class SymmetricalEncryption:
@@ -20,6 +21,10 @@ class SymmetricalEncryption:
 
     # генерация симметричного ключа
     def generation_symmetric_key(self):
+        """
+        :param size: размер ключа
+        :return:
+        """
         return os.urandom(self.size)
 
     def get_symmetric_key(self):
@@ -41,24 +46,3 @@ class SymmetricalEncryption:
         except:
             logging.error(f"error in file")
         return key
-
-    # шифрование и паддинг текста симметричным алгоритмом
-    def encrypt_simm(self, key, data):
-        iv = os.urandom(16)
-        cipher = Cipher(algorithms.ChaCha20(self.symm_key), modes.CBC(iv))
-        encryptor = cipher.encryptor()
-        padder = sym_padding.PKCS7(128).padder()
-        padded_data = padder.update(data) + padder.finalize()
-        ct = encryptor.update(padded_data) + encryptor.finalize()
-        return iv + ct
-
-    # дешифрование и депаддинг текста симметричным алгоритмом
-    def decrypt_simm(self, key, data):
-        iv = data[:16]
-        ct = data[16:]
-        cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
-        decryptor = cipher.decryptor()
-        padded_data = decryptor.update(ct) + decryptor.finalize()
-        unpadder = sym_padding.PKCS7(128).unpadder()
-        data = unpadder.update(padded_data) + unpadder.finalize()
-        return data
