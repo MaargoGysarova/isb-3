@@ -22,7 +22,6 @@ class MainWindow(QMainWindow):
         btn_font_main = QFont('Impact', 25)
         btn_StyleSheet_main = 'background-color: #ffffff; color: #4682B4; border :1px solid;'
 
-        # параметры окна
         self.setGeometry(50, 50, 1200, 675)
         self.setWindowTitle('Application programing laba 3')
         self.setFixedSize(self.size())
@@ -74,7 +73,7 @@ class MainWindow(QMainWindow):
         self.button3.leaveEvent = lambda event: self.button3.setStyleSheet(
             'background-color: #ffffff; color: #4682B4; border :1px solid;')
 
-        # 4 кнопка для считывания ключей из файла
+
         self.button4 = QtWidgets.QPushButton(self)
         self.button4.setText("Считать ключи из файла")
         self.button4.setGeometry(450, 230, 300, 50)
@@ -92,8 +91,6 @@ class MainWindow(QMainWindow):
          Click button 1
         :return:
         """
-
-        # строка для ввода текста и кнопка для его сохранения в переменную
         self.input_text = QLineEdit(self)
         self.input_text.setGeometry(450, 150, 300, 50)
         self.input_text.setFixedWidth(400)
@@ -125,27 +122,22 @@ class MainWindow(QMainWindow):
         self.button_save_input_text.clicked.connect(self.button_save_input_text.hide)
         self.button_save_input_text.clicked.connect(self.save_crypto)
 
-        print('button 1')
         self.count += 1
-        print(self.count)
 
     def save_crypto(self) -> None:
         """
         Save keys in files
         :return:
         """
-        # сохранение введенного текста в переменную
         way = self.input_text.text()
-        # создать папку в проекте для хранения ключей с названием way
         if os.path.exists(way):
             shutil.rmtree(way)
         if not os.path.exists(way):
             os.mkdir(way)
 
-        # классы для генерации ключей и их сериализации
         self.sym_encrpt = symmetrical_encrpt.SymmetricalEncryption(256, way)
         self.asym_encrpt = asymmetric_encrpt.AsymmetricEncryption(256, way)
-        # сохранение ключей в файлы
+
         self.sym_encrpt.serialization_symmetric_key()
 
         self.asym_encrpt.serialization_asymmetric_private_key()
@@ -159,7 +151,6 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.text = self.input_text.text()
-        # print(self.text)
         self.input_text.close()
 
     def input_text_changed(self, text: str) -> None:
@@ -175,7 +166,7 @@ class MainWindow(QMainWindow):
         Click button 2
         :return:
         """
-        print('button 2')
+        logging.info('button 2')
         if self.count == 0:
             self.buttonClicked_fail()
         else:
@@ -190,7 +181,7 @@ class MainWindow(QMainWindow):
         Click button 3
         :return:
         """
-        print('button 3')
+        logging.info('button 3')
         if self.count == 0:
             self.buttonClicked_fail()
         else:
@@ -202,12 +193,15 @@ class MainWindow(QMainWindow):
             self.buttonSuccess_deshifr(way_decr)
 
     def click_button_4(self) -> None:
-        ## загрузить ключи из файла
-        print('button 4')
-        ## выбор папки с ключами
+        """
+        Click button 4
+        :return:
+        """
+        logging.info('button 4')
+
         way = str(QFileDialog.getExistingDirectory(caption='Выберите папку с ключами'))
         self.way = way
-        ## выбор файла в этой папке
+
         way_public = os.path.join(way, 'public_key.txt')
         way_private = os.path.join(way, 'private_key.txt')
         way_symmetric = os.path.join(way, 'encr_symmetric_key.txt')

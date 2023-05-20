@@ -1,11 +1,5 @@
 import os
-from cryptography.hazmat.primitives import padding as sym_padding
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import logging
-from cryptography.hazmat.primitives.ciphers.algorithms import ChaCha20
-
-
-
 
 
 class SymmetricalEncryption:
@@ -22,9 +16,9 @@ class SymmetricalEncryption:
         }
         self.symm_key = self.generation_symmetric_key()
 
-    # генерация симметричного ключа
     def generation_symmetric_key(self):
         """
+        Генерация симметричного ключа
         :param size: размер ключа
         :return:
         """
@@ -33,16 +27,22 @@ class SymmetricalEncryption:
     def get_symmetric_key(self):
         return self.symm_key
 
-    # сериализация симметричного ключа
     def serialization_symmetric_key(self):
+        """
+        Сериализация симметричного ключа
+        :return:
+        """
         try:
             with open(self.settings['symmetric_key'], 'wb') as key_out:
                 key_out.write(self.symm_key)
         except:
             logging.error(f"error in file")
 
-    # десериализация симметричного ключа
     def deserialization_symmetric_key(self):
+        """
+        Десериализация симметричного ключа
+        :return:
+        """
         try:
             with open(self.settings['symmetric_key'], 'rb') as key_in:
                 key = key_in.read()
@@ -51,6 +51,11 @@ class SymmetricalEncryption:
         return key
 
     def deserialization_symmetric_key_way(self, way):
+        """
+        Десериализация симметричного ключа с указанным путем
+        :param way: путь к файлу
+        :return:
+        """
         try:
             with open(way, 'rb') as key_in:
                 key = key_in.read()
@@ -58,4 +63,4 @@ class SymmetricalEncryption:
             logging.warning(f"{err} ошибка при чтении из файла {way}")
         else:
             logging.info("Приватный ключ прочитан")
-        self.symm_key =  key
+        self.symm_key = key

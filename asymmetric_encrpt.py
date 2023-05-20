@@ -28,9 +28,9 @@ class AsymmetricEncryption:
         }
         self.private_key, self.public_key = self.generation_asymmetric_key()
 
-    # генерация пары ключей для асимметричного алгоритма шифрования
     def generation_asymmetric_key(self) -> tuple:
         """
+        Генерация пары ключей для асимметричного алгоритма шифрования
         :param size: размер ключа
         :return:
         """
@@ -42,9 +42,9 @@ class AsymmetricEncryption:
         public_key = keys.public_key()
         return private_key, public_key
 
-    # сериализация приватного ключа в формате PEM
     def serialization_asymmetric_private_key(self) -> None:
         """
+        Сериализация приватного ключа в формате PEM
         :param private_key: приватный ключ
         :return:
         """
@@ -57,8 +57,11 @@ class AsymmetricEncryption:
         except:
             logging.error(f"error in file")
 
-    # сериализация публичного ключа в формате PEM
     def serialization_asymmetric_public_key(self) -> None:
+        """
+        Сериализация публичного ключа в формате PEM
+        :return:
+        """
         public_key = self.public_key
         try:
             with open(self.settings['public_key'], 'wb') as public_out:
@@ -67,8 +70,11 @@ class AsymmetricEncryption:
         except:
             logging.error(f"error in file")
 
-    # десериализация открытого ключа
     def get_public_key(self) -> bytes:
+        """
+        Функция десериализации открытого ключа
+        :return:
+        """
         with open(self.settings['public_key'], 'rb') as pem_in:
             public_bytes = pem_in.read()
         d_public_key = load_pem_public_key(public_bytes)
@@ -84,9 +90,9 @@ class AsymmetricEncryption:
         d_private_key = load_pem_private_key(private_bytes, password=None, )
         return d_private_key
 
-    ## десериализация закрытого ключа
     def deserialization_asymmetric_private_key(self, way) -> bytes:
         """
+        Десериализация закрытого ключа с указанным путем
         :param way: путь к закрытому ключу
         :return:
         """
@@ -98,10 +104,11 @@ class AsymmetricEncryption:
         else:
             logging.info("Приватный ключ прочитан")
         d_private_key = load_pem_private_key(private_bytes, password=None, )
-        self.private_key =  d_private_key
+        self.private_key = d_private_key
 
     def deserialization_asymmetric_public_key(self, way) -> None:
         """
+        Десериализация открытого ключа с указанным путем
         :param way: путь к открытому ключу
         :return:
         """
@@ -115,16 +122,15 @@ class AsymmetricEncryption:
         d_public_key = load_pem_public_key(public_bytes)
         self.public_key = d_public_key
 
-
     def encryption_text(self, way_file: str) -> None:
         """
         Функция шифрования текста алгоритмом RSA-OAEP
         :param way_file:
         :return:
         """
-        # расшифровка симметричного ключа
+
         symmetric_key = self.decryption_symmetric_key()
-        # чтение файла
+
         try:
             with open(way_file, 'r', encoding='utf-8') as f:
                 text = f.read()
@@ -132,7 +138,7 @@ class AsymmetricEncryption:
             logging.warning(f"{err} ошибка при чтении из файла {way_file}")
         else:
             logging.info("Текст прочитан")
-        # шифрование текста
+
         padder = sym_padding.ANSIX923(128).padder()
         padded_text = padder.update(bytes(text, 'utf-8')) + padder.finalize()
         nonce = os.urandom(16)
@@ -162,9 +168,9 @@ class AsymmetricEncryption:
 
             Возвращает путь до расщифрованного файла
         """
-        # расшифровка симметричного ключа
+
         symmetric_key = self.decryption_symmetric_key()
-        # чтение файла
+
         try:
             with open(way_file, 'rb') as f:
                 ciphertext = f.read()
@@ -192,7 +198,6 @@ class AsymmetricEncryption:
         else:
             logging.info("Текст расшифрован")
 
-    # Зашифровать ключ симметричного шифрования открытым ключом и сохранить по указанному пути.
     def encryption_symmetric_key(self, key: bytes) -> None:
         """
             Функция шифрования ключа симметричного шифрования
@@ -207,7 +212,6 @@ class AsymmetricEncryption:
         except:
             logging.error(f"error in file")
 
-    # Расшифровать ключ симметричного шифрования закрытым ключом и сохранить по указанному пути.
     def decryption_symmetric_key(self) -> bytes:
         """
                 Функция расшифровки ключа симметричного шифрования
