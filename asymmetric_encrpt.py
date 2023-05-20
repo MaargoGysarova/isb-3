@@ -168,7 +168,6 @@ class AsymmetricEncryption:
 
             Возвращает путь до расщифрованного файла
         """
-
         symmetric_key = self.decryption_symmetric_key()
 
         try:
