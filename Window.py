@@ -7,6 +7,7 @@ import sys
 from PyQt6 import QtWidgets
 import symmetrical_encrpt
 import asymmetric_encrpt
+import logging
 
 
 class MainWindow(QMainWindow):
@@ -47,7 +48,7 @@ class MainWindow(QMainWindow):
 
         self.button2 = QtWidgets.QPushButton(self)
         self.button2.setText("Зашифровать текст")
-        self.button2.setGeometry(450, 230, 300, 50)
+        self.button2.setGeometry(450, 390, 300, 50)
         self.button2.setFixedWidth(400)
         self.button2.setFont(btn_font_main)
         self.button2.setStyleSheet(btn_StyleSheet_main)
@@ -73,6 +74,19 @@ class MainWindow(QMainWindow):
         self.button3.leaveEvent = lambda event: self.button3.setStyleSheet(
             'background-color: #ffffff; color: #4682B4; border :1px solid;')
 
+        # 4 кнопка для считывания ключей из файла
+        self.button4 = QtWidgets.QPushButton(self)
+        self.button4.setText("Считать ключи из файла")
+        self.button4.setGeometry(450, 230, 300, 50)
+        self.button4.setFixedWidth(400)
+        self.button4.setFont(btn_font_main)
+        self.button4.setStyleSheet(btn_StyleSheet_main)
+        self.button4.clicked.connect(self.click_button_4)
+
+        self.button4.enterEvent = lambda event: self.button4.setStyleSheet(
+            'background-color: #ffffff; color: #D2691E; border :1px solid; border-color: #D2691E;')
+        self.button4.leaveEvent = lambda event: self.button4.setStyleSheet(
+            'background-color: #ffffff; color: #4682B4; border :1px solid;')
     def click_button_1(self):
         """
          Click button 1
@@ -187,23 +201,50 @@ class MainWindow(QMainWindow):
             self.buttonSuccess_shifr(way_decr)
             self.buttonSuccess_deshifr(way_decr)
 
+    def click_button_4(self) -> None:
+        ## загрузить ключи из файла
+        print('button 4')
+        ## выбор папки с ключами
+        way = str(QFileDialog.getExistingDirectory(caption='Выберите папку с ключами'))
+        self.way = way
+        ## выбор файла в этой папке
+        way_public = os.path.join(way, 'public_key.txt')
+        way_private = os.path.join(way, 'private_key.txt')
+        way_symmetric = os.path.join(way, 'encr_symmetric_key.txt')
+
+        self.sym_encrpt = symmetrical_encrpt.SymmetricalEncryption(256, way)
+        self.asym_encrpt = asymmetric_encrpt.AsymmetricEncryption(256, way)
+
+        self.asym_encrpt.deserialization_asymmetric_public_key(way_public)
+        self.asym_encrpt.deserialization_asymmetric_private_key(way_private)
+        self.sym_encrpt.deserialization_symmetric_key_way(way_symmetric)
+
+
+        self.count += 1
+
+
     def buttonClicked_fail(self) -> None:
-        self.statusBar().showMessage("Сначала сгенерируйте ключи", 4000)
+        logging.error('Сначала сгенерируйте ключи или загрузите из файла')
+        self.statusBar().showMessage("Сначала сгенерируйте ключи или загрузите из файла ", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
     def buttonSuccess_gen(self) -> None:
+        logging.info('Ключи сгенерированы')
         self.statusBar().showMessage("Ключи сгенерированы", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
     def buttonSuccess_shifr(self, way_file: str) -> None:
+        logging.info(f"Текст зашифрован в файл {way_file}")
         self.statusBar().showMessage(f"Текст зашифрован в файл {way_file}", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
     def buttonSuccess_deshifr(self, way_file: str) -> None:
+        logging.info(f"Текст дешифрован в файл {way_file}")
         self.statusBar().showMessage(f"Текст дешифрован в файл {way_file}", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 
     def buttonSuccess_save(self) -> None:
+        logging.info('Сохранено')
         self.statusBar().showMessage("Сохранено", 4000)
         self.statusBar().setStyleSheet("background-color: #ffffff; color: #4682B4;")
 

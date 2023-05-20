@@ -84,6 +84,38 @@ class AsymmetricEncryption:
         d_private_key = load_pem_private_key(private_bytes, password=None, )
         return d_private_key
 
+    ## десериализация закрытого ключа
+    def deserialization_asymmetric_private_key(self, way) -> bytes:
+        """
+        :param way: путь к закрытому ключу
+        :return:
+        """
+        try:
+            with open(way, 'rb') as pem_in:
+                private_bytes = pem_in.read()
+        except OSError as err:
+            logging.warning(f"{err} ошибка при чтении из файла {way}")
+        else:
+            logging.info("Приватный ключ прочитан")
+        d_private_key = load_pem_private_key(private_bytes, password=None, )
+        self.private_key =  d_private_key
+
+    def deserialization_asymmetric_public_key(self, way) -> None:
+        """
+        :param way: путь к открытому ключу
+        :return:
+        """
+        try:
+            with open(way, 'rb') as pem_in:
+                public_bytes = pem_in.read()
+        except OSError as err:
+            logging.warning(f"{err} ошибка при чтении из файла {way}")
+        else:
+            logging.info("Публичный ключ прочитан")
+        d_public_key = load_pem_public_key(public_bytes)
+        self.public_key = d_public_key
+
+
     def encryption_text(self, way_file: str) -> None:
         """
         Функция шифрования текста алгоритмом RSA-OAEP

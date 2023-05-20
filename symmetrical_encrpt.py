@@ -5,6 +5,9 @@ import logging
 from cryptography.hazmat.primitives.ciphers.algorithms import ChaCha20
 
 
+
+
+
 class SymmetricalEncryption:
     def __init__(self, size: int, way: str) -> None:
         self.size = int(size / 8)
@@ -46,3 +49,13 @@ class SymmetricalEncryption:
         except:
             logging.error(f"error in file")
         return key
+
+    def deserialization_symmetric_key_way(self, way):
+        try:
+            with open(way, 'rb') as key_in:
+                key = key_in.read()
+        except OSError as err:
+            logging.warning(f"{err} ошибка при чтении из файла {way}")
+        else:
+            logging.info("Приватный ключ прочитан")
+        self.symm_key =  key
