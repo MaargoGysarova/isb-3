@@ -36,7 +36,7 @@ class SymmetricalEncryption:
             with open(self.settings['symmetric_key'], 'wb') as key_out:
                 key_out.write(self.symm_key)
         except:
-            logging.error(f"error in file")
+            logging.error("error in file")
 
     def deserialization_symmetric_key(self):
         """
@@ -47,7 +47,7 @@ class SymmetricalEncryption:
             with open(self.settings['symmetric_key'], 'rb') as key_in:
                 key = key_in.read()
         except:
-            logging.error(f"error in file")
+            logging.error("error in file")
         return key
 
     def deserialization_symmetric_key_way(self, way):

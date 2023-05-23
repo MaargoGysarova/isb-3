@@ -209,7 +209,7 @@ class AsymmetricEncryption:
             with open(self.settings['encr_symmetric_key'], 'wb') as file:
                 file.write(ciphertext)
         except:
-            logging.error(f"error in file")
+            logging.error("error in file")
 
     def decryption_symmetric_key(self) -> bytes:
         """
@@ -239,6 +239,6 @@ class AsymmetricEncryption:
             with open(self.settings['decr_symmetric_key'], 'wb') as file:
                 file.write(symmetric_decr_key)
         except:
-            logging.error(f"error in file")
+            logging.error("error in file")
 
         return symmetric_decr_key

@@ -159,7 +159,7 @@ class MainWindow(QMainWindow):
         :param text:
         :return:
         """
-        print(text)
+        logging.info(text)
 
     def click_button_2(self) -> None:
         """
