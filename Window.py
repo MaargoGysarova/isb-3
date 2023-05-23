@@ -82,10 +82,10 @@ class MainWindow(QMainWindow):
         self.button4.leaveEvent = lambda event: self.button4.setStyleSheet(
             'background-color: #ffffff; color: #4682B4; border :1px solid;')
 
-    def click_button_1(self):
+    def click_button_1(self)->None:
         """
          Click button 1
-        :return:
+        :return: None
         """
         self.input_text = QLineEdit(self)
         self.input_text.setGeometry(450, 150, 300, 50)
@@ -120,7 +120,7 @@ class MainWindow(QMainWindow):
     def save_crypto(self) -> None:
         """
         Save keys in files
-        :return:
+        :return: None
         """
         name_folder = self.input_text.text()
         if os.path.exists(name_folder):
@@ -141,7 +141,7 @@ class MainWindow(QMainWindow):
     def buttonClicked_save_input_text(self) -> None:
         """
         Save input text in variable
-        :return:
+        :return: None
         """
         self.text = self.input_text.text()
         self.input_text.close()
@@ -150,7 +150,7 @@ class MainWindow(QMainWindow):
         """
         Show input text
         :param text:
-        :return:
+        :return: None
         """
         logging.info(text)
 
