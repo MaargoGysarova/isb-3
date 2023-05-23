@@ -46,7 +46,7 @@ class AsymmetricEncryption:
         """
         Сериализация приватного ключа в формате PEM
         :param private_key: приватный ключ
-        :return:
+        :return: None
         """
         private_key = self.private_key
         try:
@@ -60,7 +60,7 @@ class AsymmetricEncryption:
     def serialization_asymmetric_public_key(self) -> None:
         """
         Сериализация публичного ключа в формате PEM
-        :return:
+        :return: None
         """
         public_key = self.public_key
         try:
@@ -73,7 +73,7 @@ class AsymmetricEncryption:
     def get_public_key(self) -> bytes:
         """
         Функция десериализации открытого ключа
-        :return:
+        :return: открытый ключ
         """
         with open(self.settings['public_key'], 'rb') as pem_in:
             public_bytes = pem_in.read()
@@ -83,7 +83,7 @@ class AsymmetricEncryption:
     def get_private_key(self) -> bytes:
         """
         Функция десериализации закрытого ключа
-        :return:
+        :return: закрытый ключ
         """
         with open(self.settings['privet_key'], 'rb') as pem_in:
             private_bytes = pem_in.read()
@@ -94,7 +94,7 @@ class AsymmetricEncryption:
         """
         Десериализация закрытого ключа с указанным путем
         :param way: путь к закрытому ключу
-        :return:
+        :return: закрытый ключ
         """
         try:
             with open(way, 'rb') as pem_in:
@@ -110,7 +110,7 @@ class AsymmetricEncryption:
         """
         Десериализация открытого ключа с указанным путем
         :param way: путь к открытому ключу
-        :return:
+        :return: None
         """
         try:
             with open(way, 'rb') as pem_in:
@@ -126,7 +126,7 @@ class AsymmetricEncryption:
         """
         Функция шифрования текста алгоритмом RSA-OAEP
         :param way_file:
-        :return:
+        :return: None
         """
 
         symmetric_key = self.decryption_symmetric_key()
