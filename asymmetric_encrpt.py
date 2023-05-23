@@ -55,7 +55,7 @@ class AsymmetricEncryption:
                                                             format=serialization.PrivateFormat.TraditionalOpenSSL,
                                                             encryption_algorithm=serialization.NoEncryption()))
         except:
-            logging.error(f"error in file")
+            logging.error("error in file")
 
     def serialization_asymmetric_public_key(self) -> None:
         """
@@ -68,7 +68,7 @@ class AsymmetricEncryption:
                 public_out.write(public_key.public_bytes(encoding=serialization.Encoding.PEM,
                                                          format=serialization.PublicFormat.SubjectPublicKeyInfo))
         except:
-            logging.error(f"error in file")
+            logging.error("error in file")
 
     def get_public_key(self) -> bytes:
         """

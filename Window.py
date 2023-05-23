@@ -65,7 +65,6 @@ class MainWindow(QMainWindow):
         self.button3.setFixedWidth(400)
         self.button3.setFont(btn_font_main)
         self.button3.setStyleSheet(btn_StyleSheet_main)
-        print(self.count)
         self.button3.clicked.connect(self.click_button_3)
 
         self.button3.enterEvent = lambda event: self.button3.setStyleSheet(
@@ -100,7 +99,7 @@ class MainWindow(QMainWindow):
         self.input_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.input_text.textChanged.connect(self.input_text_changed)
 
-        # кнопка для сохранения введенного текста в переменную
+
         self.button_save_input_text = QtWidgets.QPushButton(self)
         self.button_save_input_text.setText("Сохранить")
         self.button_save_input_text.setGeometry(450, 230, 300, 50)
@@ -113,11 +112,11 @@ class MainWindow(QMainWindow):
         self.button_save_input_text.leaveEvent = lambda event: self.button_save_input_text.setStyleSheet(
             'background-color: #ffffff; color: #4682B4; border :1px solid;')
 
-        # показать строку для ввода текста и кнопку для сохранения введенного текста
+
         self.input_text.show()
         self.button_save_input_text.show()
 
-        # после нажатия кнопки Сохранить, скрыть строку для ввода текста и кнопку для сохранения введенного текста
+
         self.button_save_input_text.clicked.connect(self.input_text.hide)
         self.button_save_input_text.clicked.connect(self.button_save_input_text.hide)
         self.button_save_input_text.clicked.connect(self.save_crypto)
@@ -129,14 +128,14 @@ class MainWindow(QMainWindow):
         Save keys in files
         :return:
         """
-        way = self.input_text.text()
-        if os.path.exists(way):
-            shutil.rmtree(way)
-        if not os.path.exists(way):
-            os.mkdir(way)
+        name_folder= self.input_text.text()
+        if os.path.exists(name_folder):
+            shutil.rmtree(name_folder)
+        if not os.path.exists(name_folder):
+            os.mkdir(name_folder)
 
-        self.sym_encrpt = symmetrical_encrpt.SymmetricalEncryption(256, way)
-        self.asym_encrpt = asymmetric_encrpt.AsymmetricEncryption(256, way)
+        self.sym_encrpt = symmetrical_encrpt.SymmetricalEncryption(256, name_folder)
+        self.asym_encrpt = asymmetric_encrpt.AsymmetricEncryption(256, name_folder)
 
         self.sym_encrpt.serialization_symmetric_key()
 
