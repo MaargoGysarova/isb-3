@@ -1,4 +1,4 @@
-import os, shutil, logging , sys
+import os, shutil, logging, sys
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtWidgets import QApplication, QMainWindow, QToolTip, QLabel, QFileDialog, QLineEdit
@@ -69,7 +69,6 @@ class MainWindow(QMainWindow):
         self.button3.leaveEvent = lambda event: self.button3.setStyleSheet(
             'background-color: #ffffff; color: #4682B4; border :1px solid;')
 
-
         self.button4 = QtWidgets.QPushButton(self)
         self.button4.setText("Считать ключи из файла")
         self.button4.setGeometry(450, 230, 300, 50)
@@ -82,6 +81,7 @@ class MainWindow(QMainWindow):
             'background-color: #ffffff; color: #D2691E; border :1px solid; border-color: #D2691E;')
         self.button4.leaveEvent = lambda event: self.button4.setStyleSheet(
             'background-color: #ffffff; color: #4682B4; border :1px solid;')
+
     def click_button_1(self):
         """
          Click button 1
@@ -96,7 +96,6 @@ class MainWindow(QMainWindow):
         self.input_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.input_text.textChanged.connect(self.input_text_changed)
 
-
         self.button_save_input_text = QtWidgets.QPushButton(self)
         self.button_save_input_text.setText("Сохранить")
         self.button_save_input_text.setGeometry(450, 230, 300, 50)
@@ -109,10 +108,8 @@ class MainWindow(QMainWindow):
         self.button_save_input_text.leaveEvent = lambda event: self.button_save_input_text.setStyleSheet(
             'background-color: #ffffff; color: #4682B4; border :1px solid;')
 
-
         self.input_text.show()
         self.button_save_input_text.show()
-
 
         self.button_save_input_text.clicked.connect(self.input_text.hide)
         self.button_save_input_text.clicked.connect(self.button_save_input_text.hide)
@@ -125,7 +122,7 @@ class MainWindow(QMainWindow):
         Save keys in files
         :return:
         """
-        name_folder= self.input_text.text()
+        name_folder = self.input_text.text()
         if os.path.exists(name_folder):
             shutil.rmtree(name_folder)
         if not os.path.exists(name_folder):
@@ -209,9 +206,7 @@ class MainWindow(QMainWindow):
         self.asym_encrpt.deserialization_asymmetric_private_key(way_private)
         self.sym_encrpt.deserialization_symmetric_key_way(way_symmetric)
 
-
         self.count += 1
-
 
     def buttonClicked_fail(self) -> None:
         logging.error('Сначала сгенерируйте ключи или загрузите из файла')
